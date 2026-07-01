@@ -1,5 +1,4 @@
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
+import { SERVER_API_URL } from "./apiBase";
 
 /**
  * Normalize uploaded image URLs to same-origin paths proxied by Next.js.
@@ -31,7 +30,11 @@ export function absoluteImageUrl(url: string): string {
   const resolved = resolveImageSrc(url);
 
   if (resolved.startsWith("/uploads/")) {
-    return `${API_URL.replace(/\/$/, "")}${resolved}`;
+    const site = process.env.NEXT_PUBLIC_SITE_URL;
+    if (site) {
+      return `${site.replace(/\/$/, "")}${resolved}`;
+    }
+    return `${SERVER_API_URL.replace(/\/$/, "")}${resolved}`;
   }
 
   if (resolved.startsWith("/")) {

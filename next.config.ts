@@ -46,10 +46,15 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const base = apiUrl.replace(/\/$/, "");
     return [
       {
+        source: "/api/:path*",
+        destination: `${base}/api/:path*`,
+      },
+      {
         source: "/uploads/:path*",
-        destination: `${apiUrl.replace(/\/$/, "")}/uploads/:path*`,
+        destination: `${base}/uploads/:path*`,
       },
     ];
   },

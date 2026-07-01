@@ -1,15 +1,13 @@
 import { PortfolioData, ContactFormData, ContactSubmission } from "@/types/portfolio";
 import { PortfolioAdminData } from "@/types/localized";
 import { Locale } from "@/types/localized";
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
+import { apiBase } from "./apiBase";
 
 export async function fetchPortfolioServer(
   locale: Locale
 ): Promise<PortfolioData | null> {
   try {
-    const res = await fetch(`${API_URL}/api/portfolio?lang=${locale}`, {
+    const res = await fetch(`${apiBase()}/api/portfolio?lang=${locale}`, {
       next: { revalidate: 60 },
     });
 
@@ -24,7 +22,7 @@ export async function fetchPortfolioServer(
 }
 
 export async function fetchPortfolio(locale: Locale): Promise<PortfolioData> {
-  const res = await fetch(`${API_URL}/api/portfolio?lang=${locale}`, {
+  const res = await fetch(`${apiBase()}/api/portfolio?lang=${locale}`, {
     cache: "no-store",
   });
 
@@ -46,7 +44,7 @@ export async function fetchPortfolioSafe(
 }
 
 export async function submitContact(data: ContactFormData): Promise<void> {
-  const res = await fetch(`${API_URL}/api/contact`, {
+  const res = await fetch(`${apiBase()}/api/contact`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -66,7 +64,7 @@ export async function adminLogin(
   username: string,
   password: string
 ): Promise<string> {
-  const res = await fetch(`${API_URL}/api/admin/login`, {
+  const res = await fetch(`${apiBase()}/api/admin/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -84,7 +82,7 @@ export async function adminLogin(
 export async function fetchAdminPortfolio(
   token: string
 ): Promise<PortfolioAdminData> {
-  const res = await fetch(`${API_URL}/api/admin/portfolio`, {
+  const res = await fetch(`${apiBase()}/api/admin/portfolio`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
@@ -100,7 +98,7 @@ export async function saveAdminPortfolio(
   token: string,
   data: PortfolioAdminData
 ): Promise<PortfolioAdminData> {
-  const res = await fetch(`${API_URL}/api/admin/portfolio`, {
+  const res = await fetch(`${apiBase()}/api/admin/portfolio`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -124,7 +122,7 @@ export async function uploadAdminImage(
   const formData = new FormData();
   formData.append("image", file);
 
-  const res = await fetch(`${API_URL}/api/admin/upload`, {
+  const res = await fetch(`${apiBase()}/api/admin/upload`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
@@ -143,7 +141,7 @@ export async function changeAdminPassword(
   token: string,
   payload: { username: string; currentPassword: string; newPassword: string }
 ): Promise<void> {
-  const res = await fetch(`${API_URL}/api/admin/change-password`, {
+  const res = await fetch(`${apiBase()}/api/admin/change-password`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -161,7 +159,7 @@ export async function changeAdminPassword(
 export async function fetchAdminContacts(
   token: string
 ): Promise<ContactSubmission[]> {
-  const res = await fetch(`${API_URL}/api/admin/contacts`, {
+  const res = await fetch(`${apiBase()}/api/admin/contacts`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
@@ -177,7 +175,7 @@ export async function markContactRead(
   token: string,
   id: string
 ): Promise<ContactSubmission> {
-  const res = await fetch(`${API_URL}/api/admin/contacts/${id}/read`, {
+  const res = await fetch(`${apiBase()}/api/admin/contacts/${id}/read`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -190,7 +188,7 @@ export async function markContactRead(
 }
 
 export async function deleteContact(token: string, id: string): Promise<void> {
-  const res = await fetch(`${API_URL}/api/admin/contacts/${id}`, {
+  const res = await fetch(`${apiBase()}/api/admin/contacts/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
