@@ -16,6 +16,7 @@ import AdminLogin from "./AdminLogin";
 import ImageUploadField from "./ImageUploadField";
 import AdminContacts from "./AdminContacts";
 import AdminSettings from "./AdminSettings";
+import { useToast } from "@/context/ToastProvider";
 
 const TOKEN_KEY = "admin-token";
 
@@ -124,8 +125,9 @@ export default function AdminPanel() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [data, setData] = useState<PortfolioAdminData | null>(null);
   const [tab, setTab] = useState<Tab>("profile");
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving">("idle");
   const [loadError, setLoadError] = useState("");
+  const toast = useToast();
 
   useEffect(() => {
     if (!authToken) return;
@@ -143,16 +145,17 @@ export default function AdminPanel() {
         if (!cancelled) {
           sessionStorage.removeItem(TOKEN_KEY);
           setToken(null);
-          setLoadError(
-            "Session expired or portfolio unavailable. Please log in again."
-          );
+          const message =
+            "Session expired or portfolio unavailable. Please log in again.";
+          setLoadError(message);
+          toast.error(message);
         }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [authToken]);
+  }, [authToken, toast]);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -163,8 +166,10 @@ export default function AdminPanel() {
       sessionStorage.setItem(TOKEN_KEY, authToken);
       setToken(authToken);
       setPassword("");
+      toast.success("Signed in successfully.");
     } catch (err) {
       setLoginError(err instanceof Error ? err.message : "Login failed");
+      toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoginLoading(false);
     }
@@ -174,6 +179,7 @@ export default function AdminPanel() {
     sessionStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setData(null);
+    toast.info("Logged out.");
   };
 
   const handleSave = async () => {
@@ -182,10 +188,11 @@ export default function AdminPanel() {
     try {
       const updated = await saveAdminPortfolio(authToken, data);
       setData(updated);
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2500);
+      toast.success("Portfolio saved successfully.");
     } catch {
-      setSaveStatus("error");
+      toast.error("Failed to save. Please try again.");
+    } finally {
+      setSaveStatus("idle");
     }
   };
 
@@ -247,9 +254,6 @@ export default function AdminPanel() {
           </button>
         </div>
       </header>
-
-      {saveStatus === "saved" && <p className="admin-success">Saved successfully.</p>}
-      {saveStatus === "error" && <p className="admin-error">Failed to save. Try again.</p>}
 
       <nav className="admin-tabs" aria-label="Sections">
         {TABS.map((item) => (

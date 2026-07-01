@@ -6,6 +6,7 @@ import PageHero from "./PageHero";
 import { Profile } from "@/types/portfolio";
 import { submitContact } from "@/lib/api";
 import { useMessages } from "@/hooks/useMessages";
+import { useToast } from "@/context/ToastProvider";
 
 interface ContactProps {
   profile: Profile;
@@ -14,6 +15,7 @@ interface ContactProps {
 
 export default function Contact({ profile, isActive = false }: ContactProps) {
   const t = useMessages();
+  const toast = useToast();
   const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [projectType, setProjectType] = useState("");
@@ -53,11 +55,13 @@ export default function Contact({ profile, isActive = false }: ContactProps) {
       setBudget("");
       setTimeline("");
       setMessage("");
+      toast.success(t.contact.success);
     } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to send message";
       setStatus("error");
-      setErrorMessage(
-        err instanceof Error ? err.message : "Failed to send message"
-      );
+      setErrorMessage(message);
+      toast.error(message);
     }
   };
 

@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "@/styles/style.css";
+import "@/styles/toast.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { LocaleProvider } from "@/context/LocaleProvider";
+import { ToastProvider } from "@/context/ToastProvider";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 
 const inter = Inter({
@@ -54,7 +56,9 @@ export default function RootLayout({
           Skip to content
         </a>
         <ThemeProvider>
-          <LocaleProvider>{children}</LocaleProvider>
+          <LocaleProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </LocaleProvider>
         </ThemeProvider>
         <Script
           src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { changeAdminPassword } from "@/lib/api";
+import { useToast } from "@/context/ToastProvider";
 
 interface AdminSettingsProps {
   token: string;
@@ -12,42 +13,39 @@ export default function AdminSettings({ token, username }: AdminSettingsProps) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">(
-    "idle"
-  );
-  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const toast = useToast();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setMessage("");
 
     if (newPassword.length < 8) {
-      setStatus("error");
-      setMessage("New password must be at least 8 characters.");
+      toast.error("New password must be at least 8 characters.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setStatus("error");
-      setMessage("New passwords do not match.");
+      toast.error("New passwords do not match.");
       return;
     }
 
-    setStatus("saving");
+    setSaving(true);
     try {
       await changeAdminPassword(token, {
         username,
         currentPassword,
         newPassword,
       });
-      setStatus("success");
-      setMessage("Password updated successfully.");
+      toast.success("Password updated successfully.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      setStatus("error");
-      setMessage(err instanceof Error ? err.message : "Failed to change password.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to change password."
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -93,15 +91,10 @@ export default function AdminSettings({ token, username }: AdminSettingsProps) {
         <button
           type="submit"
           className="btn-primary admin-btn"
-          disabled={status === "saving"}
+          disabled={saving}
         >
-          {status === "saving" ? "Updating…" : "Update password"}
+          {saving ? "Updating…" : "Update password"}
         </button>
-        {message && (
-          <p className={status === "error" ? "admin-error" : "admin-success"}>
-            {message}
-          </p>
-        )}
       </form>
     </div>
   );

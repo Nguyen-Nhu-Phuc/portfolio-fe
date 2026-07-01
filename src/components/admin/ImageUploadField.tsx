@@ -3,6 +3,7 @@
 import { ChangeEvent, useRef, useState } from "react";
 import PortfolioImage from "@/components/PortfolioImage";
 import { uploadAdminImage } from "@/lib/api";
+import { useToast } from "@/context/ToastProvider";
 
 interface ImageUploadFieldProps {
   label: string;
@@ -21,7 +22,7 @@ export default function ImageUploadField({
 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState("");
+  const toast = useToast();
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,13 +30,13 @@ export default function ImageUploadField({
     if (!file) return;
 
     setUploading(true);
-    setError("");
 
     try {
       const url = await uploadAdminImage(token, file);
       onChange(url);
+      toast.success("Image uploaded successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -100,8 +101,6 @@ export default function ImageUploadField({
         placeholder="Or paste image URL"
         disabled={uploading}
       />
-
-      {error && <p className="admin-error admin-image-error">{error}</p>}
     </div>
   );
 }

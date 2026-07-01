@@ -7,6 +7,7 @@ import {
   markContactRead,
 } from "@/lib/api";
 import { ContactSubmission } from "@/types/portfolio";
+import { useToast } from "@/context/ToastProvider";
 
 interface AdminContactsProps {
   token: string;
@@ -16,12 +17,17 @@ export default function AdminContacts({ token }: AdminContactsProps) {
   const [contacts, setContacts] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const toast = useToast();
 
   const load = () => {
     setLoading(true);
     fetchAdminContacts(token)
       .then(setContacts)
-      .catch(() => setError("Failed to load messages."))
+      .catch(() => {
+        const message = "Failed to load messages.";
+        setError(message);
+        toast.error(message);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -30,15 +36,25 @@ export default function AdminContacts({ token }: AdminContactsProps) {
   }, [token]);
 
   const handleMarkRead = async (id: string) => {
-    await markContactRead(token, id);
-    setContacts((prev) =>
-      prev.map((c) => (c._id === id ? { ...c, read: true } : c))
-    );
+    try {
+      await markContactRead(token, id);
+      setContacts((prev) =>
+        prev.map((c) => (c._id === id ? { ...c, read: true } : c))
+      );
+      toast.success("Message marked as read.");
+    } catch {
+      toast.error("Failed to mark message as read.");
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await deleteContact(token, id);
-    setContacts((prev) => prev.filter((c) => c._id !== id));
+    try {
+      await deleteContact(token, id);
+      setContacts((prev) => prev.filter((c) => c._id !== id));
+      toast.success("Message deleted.");
+    } catch {
+      toast.error("Failed to delete message.");
+    }
   };
 
   if (loading) return <p className="admin-loading">Loading messages…</p>;
