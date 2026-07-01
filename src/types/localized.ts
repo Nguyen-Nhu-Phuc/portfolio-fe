@@ -60,6 +60,11 @@ export interface AdminSkill {
   percentage: number;
 }
 
+export interface AdminProjectCategory {
+  slug: string;
+  label: LocalizedString;
+}
+
 export interface AdminProject {
   title: LocalizedString;
   category: LocalizedString;
@@ -95,6 +100,7 @@ export interface PortfolioAdminData {
   experience: AdminTimelineItem[];
   skills: AdminSkill[];
   projects: AdminProject[];
+  projectCategories: AdminProjectCategory[];
   blogs: AdminBlogPost[];
 }
 

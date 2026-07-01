@@ -81,6 +81,7 @@ export default function PortfolioApp({ data }: PortfolioAppProps) {
             <PortfolioSection
               isActive
               projects={data.projects}
+              projectCategories={data.projectCategories}
               onNavigate={handleNavigate}
             />
           )}

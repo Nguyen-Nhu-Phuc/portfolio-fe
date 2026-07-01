@@ -286,10 +286,3 @@ export type Messages = (typeof messages)[Locale];
 export function getMessages(locale: Locale): Messages {
   return messages[locale];
 }
-
-export const FILTER_SLUGS = [
-  { slug: "all", key: "all" as const },
-  { slug: "web design", key: "webDesign" as const },
-  { slug: "applications", key: "applications" as const },
-  { slug: "web development", key: "webDevelopment" as const },
-];

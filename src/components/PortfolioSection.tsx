@@ -6,13 +6,17 @@ import PortfolioImage from "./PortfolioImage";
 import PageHero from "./PageHero";
 import HireCta from "./HireCta";
 import ProjectModal from "./ProjectModal";
-import { Project, PageName } from "@/types/portfolio";
+import { Project, PageName, ProjectCategory } from "@/types/portfolio";
 import { getFeaturedProject } from "@/lib/portfolioHelpers";
 import { useMessages } from "@/hooks/useMessages";
-import { FILTER_SLUGS } from "@/i18n/messages";
+import {
+  buildProjectFilters,
+  resolveProjectCategories,
+} from "@/lib/projectCategories";
 
 interface PortfolioSectionProps {
   projects: Project[];
+  projectCategories?: ProjectCategory[];
   isActive?: boolean;
   onNavigate: (page: PageName) => void;
 }
@@ -32,6 +36,7 @@ function TechStack({ items }: { items: string[] }) {
 
 export default function PortfolioSection({
   projects,
+  projectCategories,
   isActive = false,
   onNavigate,
 }: PortfolioSectionProps) {
@@ -42,10 +47,10 @@ export default function PortfolioSection({
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const filters = FILTER_SLUGS.map(({ slug, key }) => ({
-    slug,
-    label: t.filters[key],
-  }));
+  const filters = buildProjectFilters(
+    resolveProjectCategories(projectCategories),
+    t.filters.all
+  );
 
   const featured = getFeaturedProject(projects);
   const displayValue =

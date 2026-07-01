@@ -64,6 +64,11 @@ export interface Project {
   featured?: boolean;
 }
 
+export interface ProjectCategory {
+  slug: string;
+  label: string;
+}
+
 export interface BlogPost {
   title: string;
   category: string;
@@ -83,6 +88,7 @@ export interface PortfolioData {
   experience: TimelineItem[];
   skills: Skill[];
   projects: Project[];
+  projectCategories?: ProjectCategory[];
   blogs: BlogPost[];
 }
 

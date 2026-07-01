@@ -17,6 +17,10 @@ import ImageUploadField from "./ImageUploadField";
 import AdminContacts from "./AdminContacts";
 import AdminSettings from "./AdminSettings";
 import { useToast } from "@/context/ToastProvider";
+import {
+  DEFAULT_PROJECT_CATEGORIES,
+  slugifyCategory,
+} from "@/lib/projectCategories";
 
 const TOKEN_KEY = "admin-token";
 
@@ -24,6 +28,7 @@ type Tab =
   | "profile"
   | "about"
   | "services"
+  | "categories"
   | "projects"
   | "skills"
   | "experience"
@@ -38,6 +43,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "profile", label: "Profile" },
   { id: "about", label: "About" },
   { id: "services", label: "Services" },
+  { id: "categories", label: "Categories" },
   { id: "projects", label: "Projects" },
   { id: "skills", label: "Skills" },
   { id: "experience", label: "Experience" },
@@ -110,6 +116,50 @@ function TextField({
   );
 }
 
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder = "Select…",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+}) {
+  return (
+    <label className="admin-field">
+      <span className="admin-label">{label}</span>
+      <select
+        className="admin-input admin-select"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function normalizeAdminPortfolio(
+  portfolio: PortfolioAdminData
+): PortfolioAdminData {
+  return {
+    ...portfolio,
+    projectCategories:
+      portfolio.projectCategories?.length > 0
+        ? portfolio.projectCategories
+        : DEFAULT_PROJECT_CATEGORIES.map((category) => ({ ...category })),
+  };
+}
+
 export default function AdminPanel() {
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -138,7 +188,7 @@ export default function AdminPanel() {
       .then((portfolio) => {
         if (!cancelled) {
           setLoadError("");
-          setData(portfolio);
+          setData(normalizeAdminPortfolio(portfolio));
         }
       })
       .catch(() => {
@@ -417,6 +467,75 @@ export default function AdminPanel() {
           </div>
         )}
 
+        {tab === "categories" && (
+          <div className="admin-section">
+            <p className="admin-hint">
+              Manage portfolio filter tabs. Projects use these categories for
+              filtering on the site.
+            </p>
+            {data.projectCategories.map((category, i) => (
+              <div className="admin-card" key={i}>
+                <LocalizedField
+                  label="Category name"
+                  value={category.label}
+                  onChange={(v) => {
+                    const projectCategories = [...data.projectCategories];
+                    const slug =
+                      category.slug || slugifyCategory(v.en);
+                    projectCategories[i] = {
+                      ...category,
+                      label: v,
+                      slug: category.slug ? category.slug : slug,
+                    };
+                    setData({ ...data, projectCategories });
+                  }}
+                />
+                <TextField
+                  label="Filter key (slug)"
+                  value={category.slug}
+                  onChange={(v) => {
+                    const projectCategories = [...data.projectCategories];
+                    projectCategories[i] = {
+                      ...category,
+                      slug: slugifyCategory(v),
+                    };
+                    setData({ ...data, projectCategories });
+                  }}
+                />
+                <button
+                  type="button"
+                  className="admin-remove-btn"
+                  onClick={() => {
+                    setData({
+                      ...data,
+                      projectCategories: data.projectCategories.filter(
+                        (_, j) => j !== i
+                      ),
+                    });
+                  }}
+                >
+                  Remove category
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="admin-add-btn"
+              onClick={() => {
+                setData({
+                  ...data,
+                  projectCategories: [
+                    ...data.projectCategories,
+                    { slug: "", label: emptyLoc() },
+                  ],
+                });
+              }}
+            >
+              Add category
+            </button>
+          </div>
+        )}
+
         {tab === "projects" && (
           <div className="admin-section">
             {data.projects.map((project, i) => (
@@ -426,16 +545,27 @@ export default function AdminPanel() {
                   projects[i] = { ...project, title: v };
                   setData({ ...data, projects });
                 }} />
-                <LocalizedField label="Category" value={project.category} onChange={(v) => {
-                  const projects = [...data.projects];
-                  projects[i] = { ...project, category: v };
-                  setData({ ...data, projects });
-                }} />
-                <TextField label="Category slug (filter key)" value={project.categorySlug} onChange={(v) => {
-                  const projects = [...data.projects];
-                  projects[i] = { ...project, categorySlug: v };
-                  setData({ ...data, projects });
-                }} />
+                <SelectField
+                  label="Category"
+                  value={project.categorySlug}
+                  placeholder="Select category"
+                  options={data.projectCategories.map((category) => ({
+                    value: category.slug,
+                    label: `${category.label.en} / ${category.label.vi}`,
+                  }))}
+                  onChange={(slug) => {
+                    const selected = data.projectCategories.find(
+                      (category) => category.slug === slug
+                    );
+                    const projects = [...data.projects];
+                    projects[i] = {
+                      ...project,
+                      categorySlug: slug,
+                      category: selected?.label ?? emptyLoc(),
+                    };
+                    setData({ ...data, projects });
+                  }}
+                />
                 <LocalizedField label="Description" value={project.description ?? emptyLoc()} onChange={(v) => {
                   const projects = [...data.projects];
                   projects[i] = { ...project, description: v };
@@ -477,7 +607,20 @@ export default function AdminPanel() {
               </div>
             ))}
             <button type="button" className="admin-add-btn" onClick={() => {
-              setData({ ...data, projects: [...data.projects, { title: emptyLoc(), category: emptyLoc(), categorySlug: "web design", image: "", url: "" }] });
+              const defaultCategory = data.projectCategories[0];
+              setData({
+                ...data,
+                projects: [
+                  ...data.projects,
+                  {
+                    title: emptyLoc(),
+                    category: defaultCategory?.label ?? emptyLoc(),
+                    categorySlug: defaultCategory?.slug ?? "",
+                    image: "",
+                    url: "",
+                  },
+                ],
+              });
             }}>Add project</button>
           </div>
         )}
