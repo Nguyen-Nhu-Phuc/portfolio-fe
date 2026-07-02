@@ -14,7 +14,7 @@ import {
 } from "@/lib/portfolio.server";
 import { Locale } from "@/types/localized";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export const dynamicParams = false;
 

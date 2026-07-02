@@ -187,61 +187,65 @@ export default function About({
           onNavigate={onNavigate}
         />
 
-        <section className="tile tile--dark-2 reveal">
-          <div className="tile-inner">
-            <h2 className="tile-heading tile-heading--on-dark">
-              {t.sections.clientFeedback}
-            </h2>
-            <ul className="testimonials-list has-scrollbar reveal-stagger">
-              {testimonials.map((item) => (
-                <li className="testimonials-item reveal" key={item.name}>
-                  <button
-                    type="button"
-                    className="testimonial-card"
-                    onClick={() => openModal(item)}
-                  >
-                    <figure className="testimonials-avatar-box">
-                      <PortfolioImage
-                        src={item.avatar}
-                        alt={item.name}
-                        width={60}
-                        height={60}
-                      />
-                    </figure>
-                    {item.role && (
-                      <p className="testimonial-role">{item.role}</p>
-                    )}
-                    <h3 className="testimonials-item-title">{item.name}</h3>
-                    <div className="testimonials-text">
-                      <p>{item.text}</p>
-                    </div>
-                    <span className="text-link-on-dark">{t.actions.readMore}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+        {testimonials.length > 0 && (
+          <section className="tile tile--dark-2 reveal">
+            <div className="tile-inner">
+              <h2 className="tile-heading tile-heading--on-dark">
+                {t.sections.clientFeedback}
+              </h2>
+              <ul className="testimonials-list has-scrollbar reveal-stagger">
+                {testimonials.map((item) => (
+                  <li className="testimonials-item reveal" key={item.name}>
+                    <button
+                      type="button"
+                      className="testimonial-card"
+                      onClick={() => openModal(item)}
+                    >
+                      <figure className="testimonials-avatar-box">
+                        <PortfolioImage
+                          src={item.avatar}
+                          alt={item.name}
+                          width={60}
+                          height={60}
+                        />
+                      </figure>
+                      {item.role && (
+                        <p className="testimonial-role">{item.role}</p>
+                      )}
+                      <h3 className="testimonials-item-title">{item.name}</h3>
+                      <div className="testimonials-text">
+                        <p>{item.text}</p>
+                      </div>
+                      <span className="text-link-on-dark">{t.actions.readMore}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
 
-        <section className="tile tile--parchment reveal">
-          <div className="tile-inner">
-            <h2 className="tile-heading">{t.sections.trustedBy}</h2>
-            <ul className="clients-list has-scrollbar reveal-stagger">
-              {clients.map((client, index) => (
-                <li className="clients-item reveal" key={index}>
-                  <a href={client.url} className="client-logo-card">
-                    <PortfolioImage
-                      src={client.logo}
-                      alt="Client logo"
-                      width={150}
-                      height={50}
-                    />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+        {clients.length > 0 && (
+          <section className="tile tile--parchment reveal">
+            <div className="tile-inner">
+              <h2 className="tile-heading">{t.sections.trustedBy}</h2>
+              <ul className="clients-list has-scrollbar reveal-stagger">
+                {clients.map((client, index) => (
+                  <li className="clients-item reveal" key={index}>
+                    <a href={client.url} className="client-logo-card">
+                      <PortfolioImage
+                        src={client.logo}
+                        alt="Client logo"
+                        width={150}
+                        height={50}
+                      />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
 
         <HireCta
           onNavigate={onNavigate}

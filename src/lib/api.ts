@@ -8,9 +8,7 @@ export async function fetchPortfolioServer(
 ): Promise<PortfolioData | null> {
   try {
     const res = await fetch(`${apiBase()}/api/portfolio?lang=${locale}`, {
-      ...(process.env.NODE_ENV === "development"
-        ? { cache: "no-store" as const }
-        : { next: { revalidate: 60 } }),
+      cache: "no-store",
     });
 
     if (!res.ok) {

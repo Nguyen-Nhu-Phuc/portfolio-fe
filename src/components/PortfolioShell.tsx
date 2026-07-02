@@ -19,27 +19,20 @@ export default function PortfolioShell({
 }: PortfolioShellProps) {
   const { locale } = useLocale();
   const t = useMessages();
-  const [fetchedByLocale, setFetchedByLocale] = useState<
+  const [dataByLocale, setDataByLocale] = useState<
     Partial<Record<Locale, PortfolioData>>
-  >({});
+  >(() => (initialData ? { [initialLocale]: initialData } : {}));
   const [error, setError] = useState<string | null>(null);
 
-  const cachedData = fetchedByLocale[locale];
-  const data =
-    locale === initialLocale && initialData
-      ? initialData
-      : (cachedData ?? null);
+  const data = dataByLocale[locale] ?? null;
 
   useEffect(() => {
-    if (locale === initialLocale && initialData) return;
-    if (cachedData) return;
-
     let cancelled = false;
 
     fetchPortfolio(locale)
       .then((result) => {
         if (!cancelled) {
-          setFetchedByLocale((prev) => ({ ...prev, [locale]: result }));
+          setDataByLocale((prev) => ({ ...prev, [locale]: result }));
           setError(null);
         }
       })
@@ -52,7 +45,7 @@ export default function PortfolioShell({
     return () => {
       cancelled = true;
     };
-  }, [locale, initialLocale, initialData, cachedData, t.misc.loadError]);
+  }, [locale, t.misc.loadError]);
 
   if (error) {
     return (

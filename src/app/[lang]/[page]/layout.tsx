@@ -3,6 +3,8 @@ import { getPortfolio } from "@/lib/portfolio.server";
 import { isLocale } from "@/lib/locale";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function PortfolioSectionLayout({
   children,
   params,
