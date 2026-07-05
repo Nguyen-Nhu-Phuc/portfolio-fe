@@ -3248,7 +3248,25 @@ textarea.form-input {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.hire-cta-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
+}
+
+.hire-cta-actions .text-link-on-dark {
+  margin-top: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  font-size: var(--fs-body);
+  line-height: 1.47;
 }
 
 .hire-cta-eyebrow {
@@ -3265,8 +3283,19 @@ textarea.form-input {
 }
 
 .hire-cta-email {
-  width: 100%;
-  margin-top: var(--space-xs);
+  max-width: 100%;
+  word-break: break-all;
+}
+
+@media (min-width: 768px) {
+  .hire-cta-inner {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hire-cta-email {
+    word-break: normal;
+  }
 }
 
 .tech-stack {
@@ -3294,24 +3323,6 @@ textarea.form-input {
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin-bottom: var(--space-xs);
-}
-
-@media (min-width: 768px) {
-  .hire-cta-inner {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .hire-cta-actions {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .hire-cta-email {
-    width: auto;
-    margin-top: 0;
-  }
 }
 
 /*-----------------------------------*\
@@ -3428,12 +3439,25 @@ textarea.form-input {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.footer-cta-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
 }
 
-.footer-cta-phone {
-  width: 100%;
-  margin-top: var(--space-xs);
+.footer-cta-actions .text-link-on-dark {
+  margin-top: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  font-size: var(--fs-body);
+  line-height: 1.47;
 }
 
 .section-header {
@@ -3626,16 +3650,6 @@ textarea.form-input {
   .footer-cta-inner {
     flex-direction: column;
     align-items: center;
-  }
-
-  .footer-cta-actions {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .footer-cta-phone {
-    width: auto;
   }
 }
 

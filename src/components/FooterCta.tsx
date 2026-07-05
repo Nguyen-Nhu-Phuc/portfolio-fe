@@ -26,26 +26,30 @@ export default function FooterCta({
           )}
         </div>
         <div className="footer-cta-actions">
-          <button
-            type="button"
-            className="btn-primary btn-on-dark"
-            onClick={() => onNavigate("contact")}
-          >
-            {t.actions.startProject}
-          </button>
-          <a
-            href={`mailto:${profile.email}`}
-            className="btn-secondary btn-on-dark"
-          >
-            {t.contact.sendEmail}
-          </a>
-          {profile.phone && (
-            <a
-              href={`tel:${profile.phone.replace(/\s/g, "")}`}
-              className="footer-cta-phone text-link-on-dark"
+          <div className="footer-cta-actions-group">
+            <button
+              type="button"
+              className="btn-primary btn-on-dark"
+              onClick={() => onNavigate("contact")}
             >
-              {profile.phone}
+              {t.actions.startProject}
+            </button>
+            <a
+              href={`mailto:${profile.email}`}
+              className="btn-secondary btn-on-dark"
+            >
+              {t.contact.sendEmail}
             </a>
+          </div>
+          {profile.phone && (
+            <div className="footer-cta-actions-group">
+              <a
+                href={`tel:${profile.phone.replace(/\s/g, "")}`}
+                className="footer-cta-phone text-link-on-dark"
+              >
+                {profile.phone}
+              </a>
+            </div>
           )}
         </div>
       </div>

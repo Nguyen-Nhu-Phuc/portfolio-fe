@@ -31,34 +31,43 @@ export default function HireCta({
           <p className="hire-cta-lead">{lead ?? t.hireCta.lead}</p>
         </div>
         <div className="hire-cta-actions">
-          <button
-            type="button"
-            className="btn-primary btn-on-dark"
-            onClick={() => onNavigate("contact")}
-          >
-            {t.actions.startProject}
-          </button>
-          <button
-            type="button"
-            className="btn-secondary btn-on-dark"
-            onClick={() => onNavigate("portfolio")}
-          >
-            {t.actions.viewCaseStudies}
-          </button>
-          {email && (
-            <a href={`mailto:${email}`} className="text-link-on-dark hire-cta-email">
-              {email}
-            </a>
-          )}
-          {resumeUrl && (
-            <a
-              href={resumeUrl}
-              className="text-link-on-dark"
-              target="_blank"
-              rel="noopener noreferrer"
+          <div className="hire-cta-actions-group">
+            <button
+              type="button"
+              className="btn-primary btn-on-dark"
+              onClick={() => onNavigate("contact")}
             >
-              {t.hero.downloadResume}
-            </a>
+              {t.actions.startProject}
+            </button>
+            <button
+              type="button"
+              className="btn-secondary btn-on-dark"
+              onClick={() => onNavigate("portfolio")}
+            >
+              {t.actions.viewCaseStudies}
+            </button>
+          </div>
+          {(email || resumeUrl) && (
+            <div className="hire-cta-actions-group hire-cta-actions-links">
+              {email && (
+                <a
+                  href={`mailto:${email}`}
+                  className="text-link-on-dark hire-cta-email"
+                >
+                  {email}
+                </a>
+              )}
+              {resumeUrl && (
+                <a
+                  href={resumeUrl}
+                  className="text-link-on-dark"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.hero.downloadResume}
+                </a>
+              )}
+            </div>
           )}
         </div>
       </div>
