@@ -8,6 +8,9 @@ import {
 } from "@/lib/api";
 import { ContactSubmission } from "@/types/portfolio";
 import { useToast } from "@/context/ToastProvider";
+import AdminListTable from "./AdminListTable";
+import AdminDetailDrawer from "./AdminDetailDrawer";
+import { truncate } from "./AdminFields";
 
 interface AdminContactsProps {
   token: string;
@@ -17,6 +20,7 @@ export default function AdminContacts({ token }: AdminContactsProps) {
   const [contacts, setContacts] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -45,6 +49,8 @@ export default function AdminContacts({ token }: AdminContactsProps) {
     };
   }, [token, toast]);
 
+  const selectedContact = contacts.find((c) => c._id === selectedId) ?? null;
+
   const handleMarkRead = async (id: string) => {
     try {
       await markContactRead(token, id);
@@ -61,6 +67,7 @@ export default function AdminContacts({ token }: AdminContactsProps) {
     try {
       await deleteContact(token, id);
       setContacts((prev) => prev.filter((c) => c._id !== id));
+      setSelectedId(null);
       toast.success("Message deleted.");
     } catch {
       toast.error("Failed to delete message.");
@@ -70,69 +77,127 @@ export default function AdminContacts({ token }: AdminContactsProps) {
   if (loading) return <p className="admin-loading">Loading messages…</p>;
   if (error) return <p className="admin-error">{error}</p>;
 
-  if (contacts.length === 0) {
-    return <p className="admin-empty">No contact submissions yet.</p>;
-  }
-
   return (
     <div className="admin-section">
-      <ul className="admin-contact-list">
-        {contacts.map((contact) => (
-          <li
-            className={`admin-contact-item${contact.read ? " read" : " unread"}`}
-            key={contact._id}
-          >
-            <div className="admin-contact-head">
-              <strong>{contact.fullname}</strong>
-              <span>{new Date(contact.createdAt).toLocaleString()}</span>
+      <AdminListTable
+        items={contacts}
+        onRowClick={(index) => setSelectedId(contacts[index]._id)}
+        emptyMessage="No contact submissions yet."
+        getRowClassName={(contact) =>
+          contact.read ? undefined : "admin-table-row-unread"
+        }
+        columns={[
+          {
+            key: "status",
+            header: "",
+            className: "admin-table-col-narrow",
+            render: (c) =>
+              c.read ? (
+                <span className="admin-table-status">Read</span>
+              ) : (
+                <span className="admin-table-status admin-table-status--new">
+                  New
+                </span>
+              ),
+          },
+          {
+            key: "name",
+            header: "Name",
+            render: (c) => c.fullname,
+          },
+          {
+            key: "email",
+            header: "Email",
+            render: (c) => c.email,
+          },
+          {
+            key: "date",
+            header: "Date",
+            className: "admin-table-col-narrow",
+            render: (c) =>
+              new Date(c.createdAt).toLocaleDateString(undefined, {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              }),
+          },
+          {
+            key: "preview",
+            header: "Message",
+            render: (c) => truncate(c.message, 50),
+          },
+        ]}
+      />
+
+      <AdminDetailDrawer
+        open={selectedContact !== null}
+        title={selectedContact?.fullname ?? "Message"}
+        onClose={() => setSelectedId(null)}
+        onDelete={
+          selectedContact
+            ? () => handleDelete(selectedContact._id)
+            : undefined
+        }
+        deleteLabel="Delete message"
+      >
+        {selectedContact && (
+          <>
+            <div className="admin-contact-detail-meta">
+              <p>
+                <strong>Email:</strong>{" "}
+                <a href={`mailto:${selectedContact.email}`}>
+                  {selectedContact.email}
+                </a>
+              </p>
+              <p>
+                <strong>Received:</strong>{" "}
+                {new Date(selectedContact.createdAt).toLocaleString()}
+              </p>
             </div>
-            <p className="admin-contact-email">
-              <a href={`mailto:${contact.email}`}>{contact.email}</a>
-            </p>
-            {(contact.projectType || contact.budget || contact.timeline) && (
+            {(selectedContact.projectType ||
+              selectedContact.budget ||
+              selectedContact.timeline) && (
               <dl className="admin-contact-meta">
-                {contact.projectType && (
+                {selectedContact.projectType && (
                   <>
                     <dt>Project</dt>
-                    <dd>{contact.projectType}</dd>
+                    <dd>{selectedContact.projectType}</dd>
                   </>
                 )}
-                {contact.budget && (
+                {selectedContact.budget && (
                   <>
                     <dt>Budget</dt>
-                    <dd>{contact.budget}</dd>
+                    <dd>{selectedContact.budget}</dd>
                   </>
                 )}
-                {contact.timeline && (
+                {selectedContact.timeline && (
                   <>
                     <dt>Timeline</dt>
-                    <dd>{contact.timeline}</dd>
+                    <dd>{selectedContact.timeline}</dd>
                   </>
                 )}
               </dl>
             )}
-            <p className="admin-contact-message">{contact.message}</p>
-            <div className="admin-contact-actions">
-              {!contact.read && (
+            <div className="admin-field">
+              <span className="admin-label">Message</span>
+              <p className="admin-contact-message">
+                {selectedContact.message}
+              </p>
+            </div>
+            {!selectedContact.read && (
+              <div className="admin-contact-actions">
                 <button
                   type="button"
                   className="btn-secondary admin-btn"
-                  onClick={() => handleMarkRead(contact._id)}
+                  onClick={() => handleMarkRead(selectedContact._id)}
                 >
-                  Mark read
+                  Mark as read
                 </button>
-              )}
-              <button
-                type="button"
-                className="admin-remove-btn"
-                onClick={() => handleDelete(contact._id)}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+              </div>
+            )}
+          </>
+        )}
+      </AdminDetailDrawer>
     </div>
   );
 }

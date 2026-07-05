@@ -2,6 +2,8 @@
 
 import { PageName, Profile } from "@/types/portfolio";
 import { useMessages } from "@/hooks/useMessages";
+import ArrowRightLong from "./icons/ArrowRightLong";
+import ButtonRound from "./ui/ButtonRound";
 
 interface FooterProps {
   profile: Profile;
@@ -31,9 +33,24 @@ export default function Footer({ profile, onNavigate }: FooterProps) {
       },
     ];
 
+  const handleBackToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <footer className="site-footer">
       <div className="site-footer-inner">
+        <button
+          type="button"
+          className="footer-back-to-top"
+          onClick={handleBackToTop}
+          aria-label="Back to top"
+        >
+          <ButtonRound variant="border" as="div">
+            <ArrowRightLong className="footer-back-to-top-icon" />
+          </ButtonRound>
+        </button>
+
         <div className="site-footer-brand reveal">
           <p className="site-footer-name">{profile.name}</p>
           <p className="site-footer-tagline">{profile.title}</p>

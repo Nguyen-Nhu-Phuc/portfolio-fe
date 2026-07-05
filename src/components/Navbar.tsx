@@ -1,9 +1,16 @@
 "use client";
 
+import { type CSSProperties } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { PageName, Profile } from "@/types/portfolio";
 import { useMessages } from "@/hooks/useMessages";
+import { useLocale } from "@/context/LocaleProvider";
+import { localeFromPath } from "@/lib/locale";
+import { pathForPage } from "@/lib/portfolioPages";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ButtonRound from "./ui/ButtonRound";
+import ArrowRightLong from "./icons/ArrowRightLong";
 
 interface NavbarProps {
   profile: Profile;
@@ -17,6 +24,11 @@ export default function Navbar({
   onNavigate,
 }: NavbarProps) {
   const t = useMessages();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { locale } = useLocale();
+  const routeLocale = localeFromPath(pathname) || locale;
+  const isProjectPage = /\/project\//.test(pathname);
 
   const NAV_ITEMS: { label: string; page: PageName }[] = [
     { label: t.nav.about, page: "about" },
@@ -26,45 +38,78 @@ export default function Navbar({
     { label: t.nav.contact, page: "contact" },
   ];
 
-  const activeLabel =
-    NAV_ITEMS.find((item) => item.page === activePage)?.label ?? t.nav.about;
+  const activeIndex = NAV_ITEMS.findIndex((item) => item.page === activePage);
+
+  const handleBack = () => {
+    router.push(pathForPage("portfolio", routeLocale));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <header className="site-header">
-      <nav className="global-nav" aria-label="Site">
-        <div className="chrome-inner">
+      <div className="header-bar">
+        {isProjectPage ? (
+          <ButtonRound
+            variant="accent"
+            className="header-back"
+            onClick={handleBack}
+            aria-label={t.project.backToPortfolio}
+          >
+            <ArrowRightLong className="header-back-icon" />
+          </ButtonRound>
+        ) : (
           <button
             type="button"
-            className="global-nav-brand"
+            className="header-brand"
             onClick={() => onNavigate("about")}
           >
             {profile.name}
           </button>
-          <div className="global-nav-actions">
-            <LanguageSwitcher />
-            <ThemeToggle />
-            <button
-              type="button"
-              className="global-nav-link global-nav-link--hide-mobile"
-              onClick={() => onNavigate("portfolio")}
-            >
-              {t.nav.work}
-            </button>
-            <a
-              href={`mailto:${profile.email}`}
-              className="global-nav-link global-nav-link--hide-mobile"
-            >
-              {t.nav.email}
-            </a>
-          </div>
-        </div>
-      </nav>
+        )}
 
-      <nav className="sub-nav-frosted" aria-label="Sections">
-        <div className="chrome-inner sub-nav-inner">
-          <span className="sub-nav-title" key={activePage}>
-            {activeLabel}
-          </span>
+        {!isProjectPage && (
+          <nav
+            className="header-pill-nav"
+            aria-label="Sections"
+            style={
+              {
+                "--nav-active-index": Math.max(activeIndex, 0),
+              } as CSSProperties
+            }
+          >
+            <span className="header-pill-bar" aria-hidden="true" />
+            <ul className="header-pill-list">
+              {NAV_ITEMS.map(({ label, page }) => (
+                <li key={page}>
+                  <button
+                    type="button"
+                    className={`header-pill-link${activePage === page ? " active" : ""}`}
+                    aria-current={activePage === page ? "page" : undefined}
+                    onClick={() => onNavigate(page)}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+
+        <div className="header-actions">
+          <LanguageSwitcher />
+          <ThemeToggle />
+          <button
+            type="button"
+            className="btn-primary header-cta"
+            onClick={() => onNavigate("contact")}
+          >
+            {t.nav.getInTouch}
+          </button>
+        </div>
+      </div>
+
+      {!isProjectPage && (
+        <nav className="sub-nav-mobile" aria-label="Sections">
           <ul className="sub-nav-list">
             {NAV_ITEMS.map(({ label, page }) => (
               <li className="sub-nav-item" key={page}>
@@ -79,15 +124,8 @@ export default function Navbar({
               </li>
             ))}
           </ul>
-          <button
-            type="button"
-            className="btn-primary sub-nav-cta"
-            onClick={() => onNavigate("contact")}
-          >
-            {t.nav.getInTouch}
-          </button>
-        </div>
-      </nav>
+        </nav>
+      )}
     </header>
   );
 }

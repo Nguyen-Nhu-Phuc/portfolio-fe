@@ -61,6 +61,15 @@ export const messages = {
       sending: "Sending...",
       startProject: "Start a project",
       viewCaseStudies: "View case studies",
+      close: "Close",
+    },
+    projectModal: {
+      techStack: "Tech stack",
+    },
+    project: {
+      liveView: "Live view",
+      nextProject: "Next project",
+      backToPortfolio: "Back to portfolio",
     },
     hireCta: {
       eyebrow: "Work with me",
@@ -92,6 +101,9 @@ export const messages = {
       formTitle: "Send a message",
       responseTime: "Usually replies within 24 hours on business days.",
       social: "Social",
+      statResponse: "Response time",
+      statBasedIn: "Based in",
+      statChannels: "Social channels",
     },
     sidebar: {
       showContacts: "Show Contacts",
@@ -112,6 +124,11 @@ export const messages = {
     blog: {
       journal: "Journal",
       lead: "Fresh thoughts on {category} and craft.",
+      topics: "Topics",
+      latestPost: "Latest post",
+      readLatest: "Read latest",
+      allPosts: "All posts",
+      empty: "No articles published yet.",
     },
     resume: {
       eyebrow: "Résumé",
@@ -200,6 +217,15 @@ export const messages = {
       sending: "Đang gửi...",
       startProject: "Bắt đầu dự án",
       viewCaseStudies: "Xem case study",
+      close: "Đóng",
+    },
+    projectModal: {
+      techStack: "Công nghệ sử dụng",
+    },
+    project: {
+      liveView: "Xem live",
+      nextProject: "Dự án tiếp",
+      backToPortfolio: "Về portfolio",
     },
     hireCta: {
       eyebrow: "Hợp tác cùng tôi",
@@ -231,6 +257,9 @@ export const messages = {
       formTitle: "Gửi tin nhắn",
       responseTime: "Thường phản hồi trong 24 giờ (ngày làm việc).",
       social: "Mạng xã hội",
+      statResponse: "Thời gian phản hồi",
+      statBasedIn: "Làm việc tại",
+      statChannels: "Kênh liên lạc",
     },
     sidebar: {
       showContacts: "Xem liên hệ",
@@ -251,6 +280,11 @@ export const messages = {
     blog: {
       journal: "Nhật ký",
       lead: "Chia sẻ về {category} và kỹ thuật.",
+      topics: "Chủ đề",
+      latestPost: "Bài mới nhất",
+      readLatest: "Đọc bài mới",
+      allPosts: "Tất cả bài viết",
+      empty: "Chưa có bài viết nào.",
     },
     resume: {
       eyebrow: "Hồ sơ",

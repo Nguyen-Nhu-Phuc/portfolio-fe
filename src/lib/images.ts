@@ -2,6 +2,12 @@ import { SERVER_API_URL } from "./apiBase";
 
 const CLOUDINARY_HOST = "res.cloudinary.com";
 
+/** Backend origin for /uploads paths so Next.js Image can fetch via remotePatterns. */
+function uploadSrcForNextImage(path: string): string {
+  const base = SERVER_API_URL.replace(/\/$/, "");
+  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 export function isCloudinaryUrl(url: string): boolean {
   if (!url?.trim()) return false;
 
@@ -14,7 +20,7 @@ export function isCloudinaryUrl(url: string): boolean {
 
 /**
  * Normalize image URLs for Next.js Image.
- * Local uploads use same-origin paths proxied by Next.js; Cloudinary URLs pass through.
+ * Local uploads are resolved to the backend origin for Next.js Image remotePatterns.
  */
 export function resolveImageSrc(url: string): string {
   if (!url?.trim()) return url;
@@ -24,7 +30,7 @@ export function resolveImageSrc(url: string): string {
   }
 
   if (url.startsWith("/uploads/")) {
-    return url;
+    return uploadSrcForNextImage(url);
   }
 
   try {
@@ -33,7 +39,7 @@ export function resolveImageSrc(url: string): string {
       return url;
     }
     if (parsed.pathname.startsWith("/uploads/")) {
-      return parsed.pathname;
+      return uploadSrcForNextImage(parsed.pathname);
     }
   } catch {
     // Relative paths like /images/... fall through.
@@ -43,8 +49,15 @@ export function resolveImageSrc(url: string): string {
 }
 
 export function isUploadedImage(url: string): boolean {
-  const resolved = resolveImageSrc(url);
-  return resolved.startsWith("/uploads/") || isCloudinaryUrl(resolved);
+  if (!url?.trim()) return false;
+  if (isCloudinaryUrl(url)) return true;
+  if (url.startsWith("/uploads/")) return true;
+
+  try {
+    return new URL(url).pathname.startsWith("/uploads/");
+  } catch {
+    return false;
+  }
 }
 
 export function absoluteImageUrl(url: string): string {
@@ -54,12 +67,15 @@ export function absoluteImageUrl(url: string): string {
     return resolved;
   }
 
-  if (resolved.startsWith("/uploads/")) {
-    const site = process.env.NEXT_PUBLIC_SITE_URL;
-    if (site) {
-      return `${site.replace(/\/$/, "")}${resolved}`;
+  try {
+    const parsed = new URL(resolved);
+    if (parsed.pathname.startsWith("/uploads/")) {
+      return resolved;
     }
-    return `${SERVER_API_URL.replace(/\/$/, "")}${resolved}`;
+  } catch {
+    if (resolved.startsWith("/uploads/")) {
+      return uploadSrcForNextImage(resolved);
+    }
   }
 
   if (resolved.startsWith("/")) {

@@ -25,7 +25,7 @@ export default function HireCta({
       <div className="tile-inner hire-cta-inner">
         <div className="hire-cta-copy">
           <p className="hire-cta-eyebrow">{t.hireCta.eyebrow}</p>
-          <h2 className="tile-heading tile-heading--on-dark">
+          <h2 className="tile-heading tile-heading--on-dark tile-heading--center">
             {title ?? t.hireCta.title}
           </h2>
           <p className="hire-cta-lead">{lead ?? t.hireCta.lead}</p>

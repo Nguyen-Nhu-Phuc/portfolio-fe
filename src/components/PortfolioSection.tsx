@@ -2,13 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import IonIcon from "./IonIcon";
-import PortfolioImage from "./PortfolioImage";
+import Banner from "./ui/Banner";
+import PreviewCard from "./ui/PreviewCard";
 import PageHero from "./PageHero";
 import HireCta from "./HireCta";
-import ProjectModal from "./ProjectModal";
 import { Project, PageName, ProjectCategory } from "@/types/portfolio";
 import { getFeaturedProject } from "@/lib/portfolioHelpers";
+import { pathForProject } from "@/lib/projectSlug";
 import { useMessages } from "@/hooks/useMessages";
+import { useLocale } from "@/context/LocaleProvider";
 import {
   buildProjectFilters,
   resolveProjectCategories,
@@ -21,19 +23,6 @@ interface PortfolioSectionProps {
   onNavigate: (page: PageName) => void;
 }
 
-function TechStack({ items }: { items: string[] }) {
-  if (items.length === 0) return null;
-  return (
-    <ul className="tech-stack">
-      {items.map((tech) => (
-        <li className="tech-stack-item" key={tech}>
-          {tech}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export default function PortfolioSection({
   projects,
   projectCategories,
@@ -41,10 +30,9 @@ export default function PortfolioSection({
   onNavigate,
 }: PortfolioSectionProps) {
   const t = useMessages();
+  const { locale } = useLocale();
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [selectOpen, setSelectOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
   const filters = buildProjectFilters(
@@ -65,13 +53,6 @@ export default function PortfolioSection({
     setSelectedFilter(value);
     setSelectOpen(false);
   };
-
-  const openProjectModal = (project: Project) => {
-    setSelectedProject(project);
-    setModalOpen(true);
-  };
-
-  const closeProjectModal = () => setModalOpen(false);
 
   useEffect(() => {
     if (!selectOpen) return;
@@ -99,7 +80,7 @@ export default function PortfolioSection({
           actions={[
             {
               label: t.actions.viewDetails,
-              onClick: () => openProjectModal(featured),
+              href: pathForProject(featured, locale),
             },
             {
               label: t.actions.liveSite,
@@ -111,12 +92,17 @@ export default function PortfolioSection({
       )}
 
       <div className="tile-stack">
-        <section className="tile tile--light reveal">
-          <div className="tile-inner">
-            <h2 className="tile-heading">{t.sections.selectedWork}</h2>
-            <p className="tile-subheading">{t.portfolio.subheading}</p>
+        <section className="projects tile tile--parchment reveal">
+          <div className="grid-12">
+            <div className="projects-title">
+              <Banner copy={t.nav.portfolio} size="sm" className="projects-title-banner" />
+              <h2 className="projects-title-copy">{t.sections.selectedWork}</h2>
+              <p className="projects-subheading">{t.portfolio.subheading}</p>
+            </div>
+          </div>
 
-            <ul className="filter-list reveal">
+          <div className="grid-12">
+            <ul className="filter-list reveal projects-filters">
               {filters.map(({ slug, label }) => (
                 <li className="filter-item" key={slug}>
                   <button
@@ -162,57 +148,28 @@ export default function PortfolioSection({
             {filteredProjects.length === 0 ? (
               <p className="project-empty">{t.portfolio.empty}</p>
             ) : (
-              <ul className="utility-grid utility-grid--portfolio reveal-stagger">
+              <div className="projects-cards reveal-stagger">
                 {filteredProjects.map((project) => (
-                  <li
-                    className="utility-card utility-card--project reveal"
+                  <PreviewCard
                     key={project.title}
-                  >
-                    <button
-                      type="button"
-                      className="utility-card-btn"
-                      onClick={() => openProjectModal(project)}
-                      aria-label={`${t.actions.viewProject}: ${project.title}`}
-                    >
-                      <figure className="utility-card-media">
-                        <PortfolioImage
-                          src={project.image}
-                          alt={project.title}
-                          width={400}
-                          height={280}
-                          sizes="(max-width: 768px) 100vw, 400px"
-                          loading="lazy"
-                        />
-                      </figure>
-                      <div className="utility-card-body">
-                        <p className="utility-card-meta">
-                          {project.category}
-                        </p>
-                        <h3 className="utility-card-title">{project.title}</h3>
-                        {project.description && (
-                          <p className="utility-card-text utility-card-text--clamp">
-                            {project.description}
-                          </p>
-                        )}
-                        <TechStack items={project.techStack ?? []} />
-                        <span className="text-link">{t.actions.viewCaseStudy}</span>
-                      </div>
-                    </button>
-                  </li>
+                    title={project.title}
+                    description={
+                      project.description
+                        ? `${project.category} · ${project.description}`
+                        : project.category
+                    }
+                    image={project.image}
+                    imageAlt={project.title}
+                    href={pathForProject(project, locale)}
+                  />
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         </section>
 
         <HireCta onNavigate={onNavigate} />
       </div>
-
-      <ProjectModal
-        project={selectedProject}
-        open={modalOpen}
-        onClose={closeProjectModal}
-      />
     </article>
   );
 }

@@ -15,6 +15,7 @@ interface ResumeProps {
   isActive?: boolean;
   onNavigate: (page: PageName) => void;
 }
+
 function TimelineSection({
   title,
   icon,
@@ -56,7 +57,8 @@ export default function Resume({
 }: ResumeProps) {
   const t = useMessages();
   const [skillsAnimated, setSkillsAnimated] = useState(false);
-  const topSkill = [...skills].sort((a, b) => b.percentage - a.percentage)[0];
+  const sortedSkills = [...skills].sort((a, b) => b.percentage - a.percentage);
+  const topSkill = sortedSkills[0];
 
   useEffect(() => {
     if (!isActive) return;
@@ -75,6 +77,8 @@ export default function Resume({
     <article className={`resume${isActive ? " active" : ""}`} data-page="resume">
       <PageHero
         variant="parchment"
+        compact
+        statsAside
         eyebrow={t.resume.eyebrow}
         title={t.resume.title}
         lead={lead}
@@ -105,48 +109,53 @@ export default function Resume({
 
       <div className="tile-stack">
         <section className="tile tile--light reveal">
-          <div className="tile-inner">
-            <TimelineSection
-              title={t.sections.education}
-              icon="book-outline"
-              items={education}
-            />
-            <TimelineSection
-              title={t.sections.experience}
-              icon="briefcase-outline"
-              items={experience}
-            />
-          </div>
-        </section>
+          <div className="tile-inner tile-inner--wide">
+            {sortedSkills.length > 0 && (
+              <ul className="skill-tags resume-skill-tags reveal-stagger">
+                {sortedSkills.slice(0, 8).map((skill) => (
+                  <li className="skill-tag reveal" key={skill.name}>
+                    {skill.name}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-        <section className="tile tile--dark-2 reveal">
-          <div className="tile-inner">
-            <h2 className="tile-heading tile-heading--on-dark">
-              {t.sections.mySkills}
-            </h2>
-            <ul className="skills-list skills-list--dark reveal-stagger">
-              {skills.map((skill) => (
-                <li className="skills-item reveal" key={skill.name}>
-                  <div className="title-wrapper">
-                    <h5 className="h5 skills-label--on-dark">{skill.name}</h5>
-                    <data
-                      className="skills-data--on-dark"
-                      value={skill.percentage}
-                    >
-                      {skill.percentage}%
-                    </data>
-                  </div>
-                  <div className="skill-progress-bg skill-progress-bg--dark">
-                    <div
-                      className="skill-progress-fill skill-progress-fill--on-dark"
-                      style={{
-                        width: skillsAnimated ? `${skill.percentage}%` : "0%",
-                      }}
-                    ></div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="resume-main-grid">
+              <div className="resume-timeline-column">
+                <TimelineSection
+                  title={t.sections.education}
+                  icon="book-outline"
+                  items={education}
+                />
+                <TimelineSection
+                  title={t.sections.experience}
+                  icon="briefcase-outline"
+                  items={experience}
+                />
+              </div>
+
+              <aside className="resume-skills-panel reveal">
+                <h2 className="tile-heading">{t.sections.mySkills}</h2>
+                <ul className="skills-list reveal-stagger">
+                  {sortedSkills.map((skill) => (
+                    <li className="skills-item reveal" key={skill.name}>
+                      <div className="title-wrapper">
+                        <h5 className="h5">{skill.name}</h5>
+                        <data value={skill.percentage}>{skill.percentage}%</data>
+                      </div>
+                      <div className="skill-progress-bg">
+                        <div
+                          className="skill-progress-fill"
+                          style={{
+                            width: skillsAnimated ? `${skill.percentage}%` : "0%",
+                          }}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+            </div>
           </div>
         </section>
 

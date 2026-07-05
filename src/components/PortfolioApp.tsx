@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { PortfolioData, PageName } from "@/types/portfolio";
 import { pageFromPath, pathForPage } from "@/lib/portfolioPages";
@@ -10,9 +11,9 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import FooterCta from "./FooterCta";
 import ContactFab from "./ContactFab";
+import About from "./About";
 import ScrollRevealObserver from "./ScrollRevealObserver";
 
-const About = dynamic(() => import("./About"));
 const Resume = dynamic(() => import("./Resume"));
 const PortfolioSection = dynamic(() => import("./PortfolioSection"));
 const Blog = dynamic(() => import("./Blog"));
@@ -29,12 +30,34 @@ export default function PortfolioApp({ data }: PortfolioAppProps) {
   const activePage = pageFromPath(pathname);
   const routeLocale = localeFromPath(pathname);
 
+  useEffect(() => {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo(0, 0);
+    };
+
+    scrollToTop();
+    const raf = requestAnimationFrame(scrollToTop);
+    const timer = window.setTimeout(scrollToTop, 100);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(timer);
+    };
+  }, [pathname, activePage]);
+
   const handleNavigate = (page: PageName) => {
     const nextPath = pathForPage(page, routeLocale || locale);
     if (pathname !== nextPath) {
       router.push(nextPath);
+      return;
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -94,7 +117,10 @@ export default function PortfolioApp({ data }: PortfolioAppProps) {
         </div>
       </main>
 
-      <FooterCta profile={data.profile} onNavigate={handleNavigate} />
+      <FooterCta
+        profile={data.profile}
+        onNavigate={handleNavigate}
+      />
       <Footer profile={data.profile} onNavigate={handleNavigate} />
       <ContactFab
         profile={data.profile}

@@ -62,6 +62,7 @@ export interface Project {
   description?: string;
   techStack?: string[];
   featured?: boolean;
+  gallery?: string[];
 }
 
 export interface ProjectCategory {

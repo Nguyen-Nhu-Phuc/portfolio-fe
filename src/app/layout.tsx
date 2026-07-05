@@ -1,24 +1,32 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Inter, Roboto_Mono, Urbanist } from "next/font/google";
 import "@/styles/style.css";
+import "@/styles/portfolio-theme.css";
 import "@/styles/toast.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { LocaleProvider } from "@/context/LocaleProvider";
 import { ToastProvider } from "@/context/ToastProvider";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 
-const inter = Inter({
+const urbanist = Urbanist({
   subsets: ["latin"],
-  weight: ["300", "400", "600"],
-  variable: "--font-inter",
+  weight: ["400", "700", "900"],
+  variable: "--font-urbanist",
   display: "swap",
 });
 
-const displaySerif = Cormorant_Garamond({
+const robotoMono = Roboto_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-display-serif",
+  weight: ["700"],
+  variable: "--font-banner",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -43,7 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${displaySerif.variable}`}
+      className={`${urbanist.variable} ${inter.variable} ${robotoMono.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -51,7 +59,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://unpkg.com" />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className={inter.className}>
+      <body className={urbanist.className}>
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>

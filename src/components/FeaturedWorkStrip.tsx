@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import PortfolioImage from "./PortfolioImage";
-import ProjectModal from "./ProjectModal";
+import Banner from "./ui/Banner";
+import PreviewCard from "./ui/PreviewCard";
 import { Project, PageName } from "@/types/portfolio";
 import { getPreviewProjects } from "@/lib/portfolioHelpers";
+import { pathForProject } from "@/lib/projectSlug";
 import { useMessages } from "@/hooks/useMessages";
+import { useLocale } from "@/context/LocaleProvider";
 
 interface FeaturedWorkStripProps {
   projects: Project[];
@@ -17,85 +18,52 @@ export default function FeaturedWorkStrip({
   onNavigate,
 }: FeaturedWorkStripProps) {
   const t = useMessages();
+  const { locale } = useLocale();
   const preview = getPreviewProjects(projects);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selected, setSelected] = useState<Project | null>(null);
 
   if (preview.length === 0) return null;
 
-  const openProject = (project: Project) => {
-    setSelected(project);
-    setModalOpen(true);
-  };
-
   return (
-    <>
-      <section className="tile tile--parchment reveal">
-        <div className="tile-inner">
-          <div className="section-header">
-            <div>
-              <h2 className="tile-heading">{t.featuredWork.title}</h2>
-              <p className="tile-subheading">{t.featuredWork.subheading}</p>
-            </div>
-            <button
-              type="button"
-              className="btn-secondary section-header-action"
-              onClick={() => onNavigate("portfolio")}
-            >
-              {t.featuredWork.viewAll}
-            </button>
-          </div>
-
-          <ul className="featured-work-grid reveal-stagger">
-            {preview.map((project) => (
-              <li className="featured-work-card reveal" key={project.title}>
-                <button
-                  type="button"
-                  className="featured-work-link"
-                  onClick={() => openProject(project)}
-                >
-                  <figure className="featured-work-media">
-                    <PortfolioImage
-                      src={project.image}
-                      alt={project.title}
-                      width={480}
-                      height={300}
-                      sizes="(max-width: 768px) 100vw, 320px"
-                      loading="lazy"
-                    />
-                  </figure>
-                  <div className="featured-work-body">
-                    <p className="featured-work-meta">
-                      {project.category}
-                    </p>
-                    <h3 className="featured-work-title">{project.title}</h3>
-                    {project.description && (
-                      <p className="featured-work-text">{project.description}</p>
-                    )}
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          <div className="featured-work-cta">
-            <p className="featured-work-cta-text">{t.featuredWork.ctaText}</p>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={() => onNavigate("contact")}
-            >
-              {t.actions.startProject}
-            </button>
-          </div>
+    <section className="projects tile tile--parchment reveal">
+      <div className="grid-12">
+        <div className="projects-title">
+          <Banner
+            copy={t.featuredWork.title}
+            size="sm"
+            className="projects-title-banner"
+          />
+          <h2 className="projects-title-copy">{t.sections.selectedWork}</h2>
         </div>
-      </section>
-
-      <ProjectModal
-        project={selected}
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
-    </>
+      </div>
+      <div className="grid-12">
+        <div className="projects-cards reveal-stagger">
+          {preview.map((project) => (
+            <PreviewCard
+              key={project.title}
+              title={project.title}
+              description={project.description}
+              image={project.image}
+              imageAlt={project.title}
+              href={pathForProject(project, locale)}
+            />
+          ))}
+          <PreviewCard
+            title={t.actions.startProject}
+            empty
+            emptyLabel={t.actions.startProject}
+            onClick={() => onNavigate("contact")}
+          />
+        </div>
+      </div>
+      <div className="projects-footer-cta">
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={() => onNavigate("portfolio")}
+        >
+          {t.featuredWork.viewAll}
+        </button>
+      </div>
+    </section>
   );
 }

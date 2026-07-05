@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale } from "@/context/LocaleProvider";
+import { usePathname } from "next/navigation";
 import { fetchPortfolio } from "@/lib/api";
-import { useMessages } from "@/hooks/useMessages";
+import { getMessages } from "@/i18n/messages";
+import { localeFromPath } from "@/lib/locale";
 import { PortfolioData } from "@/types/portfolio";
 import { Locale } from "@/types/localized";
 import PortfolioApp from "./PortfolioApp";
@@ -17,8 +18,9 @@ export default function PortfolioShell({
   initialData,
   initialLocale,
 }: PortfolioShellProps) {
-  const { locale } = useLocale();
-  const t = useMessages();
+  const pathname = usePathname();
+  const locale = localeFromPath(pathname) || initialLocale;
+  const t = getMessages(locale);
   const [dataByLocale, setDataByLocale] = useState<
     Partial<Record<Locale, PortfolioData>>
   >(() => (initialData ? { [initialLocale]: initialData } : {}));

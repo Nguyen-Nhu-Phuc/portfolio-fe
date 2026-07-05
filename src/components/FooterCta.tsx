@@ -8,7 +8,10 @@ interface FooterCtaProps {
   onNavigate: (page: PageName) => void;
 }
 
-export default function FooterCta({ profile, onNavigate }: FooterCtaProps) {
+export default function FooterCta({
+  profile,
+  onNavigate,
+}: FooterCtaProps) {
   const t = useMessages();
 
   return (
@@ -16,7 +19,7 @@ export default function FooterCta({ profile, onNavigate }: FooterCtaProps) {
       <div className="tile-inner footer-cta-inner">
         <div className="footer-cta-copy">
           <p className="footer-cta-eyebrow">{t.footerCta.eyebrow}</p>
-          <h2 className="footer-cta-title">{t.footerCta.title}</h2>
+          <h2 className="footer-cta-title tile-heading--center">{t.footerCta.title}</h2>
           <p className="footer-cta-lead">{t.footerCta.lead}</p>
           {profile.availability && (
             <p className="footer-cta-note">{profile.availability}</p>

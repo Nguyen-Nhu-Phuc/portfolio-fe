@@ -14,16 +14,20 @@ interface ProjectModalProps {
   onClose: () => void;
 }
 
-function TechStack({ items }: { items: string[] }) {
+function TechStack({ items, label }: { items: string[]; label: string }) {
   if (items.length === 0) return null;
+
   return (
-    <ul className="tech-stack">
-      {items.map((tech) => (
-        <li className="tech-stack-item" key={tech}>
-          {tech}
-        </li>
-      ))}
-    </ul>
+    <div className="project-modal-tech">
+      <p className="project-modal-tech-label">{label}</p>
+      <ul className="project-modal-tech-list">
+        {items.map((tech) => (
+          <li className="project-modal-tech-item" key={tech}>
+            {tech}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -44,50 +48,71 @@ export default function ProjectModal({ project, open, onClose }: ProjectModalPro
         aria-hidden="true"
       />
       <section
-        className="testimonials-modal portfolio-modal"
+        className="project-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="project-modal-title"
         ref={dialogRef}
       >
-        <button
-          type="button"
-          className="modal-close-btn"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          <IonIcon name="close-outline" />
-        </button>
-
-        <figure className="portfolio-modal-img">
+        <figure className="project-modal-hero">
           <PortfolioImage
             src={project.image}
-            alt={project.title}
-            width={800}
-            height={450}
-            sizes="(max-width: 768px) 100vw, 800px"
+            alt=""
+            className="project-modal-hero-img"
+            width={0}
+            height={0}
+            sizes="(max-width: 960px) 100vw, 920px"
+            priority
+            style={{ width: "100%", height: "auto" }}
           />
+          <div className="project-modal-hero-shade" aria-hidden="true" />
+          <button
+            type="button"
+            className="project-modal-close"
+            onClick={onClose}
+            aria-label={t.actions.close}
+          >
+            <IonIcon name="close-outline" />
+          </button>
         </figure>
 
-        <div className="portfolio-modal-body">
-          <p className="portfolio-modal-category">{project.category}</p>
-          <h3 className="h3 modal-title" id="project-modal-title">
-            {project.title}
-          </h3>
+        <div className="project-modal-panel">
+          <header className="project-modal-header">
+            <span className="project-modal-badge">{project.category}</span>
+            <h2 className="project-modal-title" id="project-modal-title">
+              {project.title}
+            </h2>
+          </header>
+
           {project.description && (
-            <p className="portfolio-modal-desc">{project.description}</p>
+            <p className="project-modal-desc">{project.description}</p>
           )}
-          <TechStack items={project.techStack ?? []} />
-          {project.url && (
-            <a
-              href={project.url}
-              className="btn-primary portfolio-modal-link"
-              target="_blank"
-              rel="noopener noreferrer"
+
+          <TechStack
+            items={project.techStack ?? []}
+            label={t.projectModal.techStack}
+          />
+
+          <footer className="project-modal-actions">
+            <button
+              type="button"
+              className="btn-secondary project-modal-action"
+              onClick={onClose}
             >
-              {t.actions.viewLiveProject}
-            </a>
-          )}
+              {t.actions.close}
+            </button>
+            {project.url && (
+              <a
+                href={project.url}
+                className="btn-primary project-modal-action"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t.actions.viewLiveProject}
+                <IonIcon name="open-outline" />
+              </a>
+            )}
+          </footer>
         </div>
       </section>
     </div>,

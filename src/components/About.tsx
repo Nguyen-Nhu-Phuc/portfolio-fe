@@ -120,23 +120,8 @@ export default function About({
       />
 
       <div className="tile-stack">
-        {topSkills.length > 0 && (
-          <section className="tile tile--light reveal">
-            <div className="tile-inner">
-              <h2 className="tile-heading">{t.sections.coreExpertise}</h2>
-              <ul className="skill-tags reveal-stagger">
-                {topSkills.map((skill) => (
-                  <li className="skill-tag reveal" key={skill.name}>
-                    {skill.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        )}
-
         <section className="tile tile--parchment reveal">
-          <div className="tile-inner">
+          <div className="tile-inner tile-inner--prose">
             <h2 className="tile-heading">{t.sections.aboutMe}</h2>
             <div className="about-text">
               {about.map((paragraph, index) => (
@@ -160,9 +145,11 @@ export default function About({
           </div>
         </section>
 
-        <section className="tile tile--light reveal">
+        <section className="tile tile--dark reveal">
           <div className="tile-inner">
-            <h2 className="tile-heading">{t.sections.whatIDeliver}</h2>
+            <h2 className="tile-heading tile-heading--on-dark tile-heading--center">
+              {t.sections.whatIDeliver}
+            </h2>
             <ul className="utility-grid reveal-stagger">
               {services.map((service) => (
                 <li className="utility-card reveal" key={service.title}>
@@ -182,6 +169,21 @@ export default function About({
           </div>
         </section>
 
+        {topSkills.length > 0 && (
+          <section className="tile tile--light reveal">
+            <div className="tile-inner tile-inner--prose">
+              <h2 className="tile-heading">{t.sections.coreExpertise}</h2>
+              <ul className="skill-tags reveal-stagger">
+                {topSkills.map((skill) => (
+                  <li className="skill-tag reveal" key={skill.name}>
+                    {skill.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+
         <FeaturedWorkStrip
           projects={portfolioSnapshot.projects}
           onNavigate={onNavigate}
@@ -190,7 +192,7 @@ export default function About({
         {testimonials.length > 0 && (
           <section className="tile tile--dark-2 reveal">
             <div className="tile-inner">
-              <h2 className="tile-heading tile-heading--on-dark">
+              <h2 className="tile-heading tile-heading--on-dark tile-heading--center">
                 {t.sections.clientFeedback}
               </h2>
               <ul className="testimonials-list has-scrollbar reveal-stagger">
@@ -226,9 +228,11 @@ export default function About({
         )}
 
         {clients.length > 0 && (
-          <section className="tile tile--parchment reveal">
-            <div className="tile-inner">
-              <h2 className="tile-heading">{t.sections.trustedBy}</h2>
+          <section className="tile tile--light reveal">
+            <div className="tile-inner tile-inner--prose">
+              <h2 className="tile-heading tile-heading--center">
+                {t.sections.trustedBy}
+              </h2>
               <ul className="clients-list has-scrollbar reveal-stagger">
                 {clients.map((client, index) => (
                   <li className="clients-item reveal" key={index}>
