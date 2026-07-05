@@ -10,6 +10,7 @@ import {
   fetchAdminPortfolio,
   saveAdminPortfolio,
 } from "@/lib/api";
+import { resolveImageSrc } from "@/lib/images";
 import Link from "next/link";
 import AdminLogin from "./AdminLogin";
 import ImageUploadField from "./ImageUploadField";
@@ -76,7 +77,14 @@ function normalizeAdminPortfolio(
 
 function TableThumb({ src, alt }: { src: string; alt?: string }) {
   if (!src) return <span className="admin-table-thumb-empty">—</span>;
-  return <img src={src} alt={alt ?? ""} className="admin-table-thumb" />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={resolveImageSrc(src)}
+      alt={alt ?? ""}
+      className="admin-table-thumb"
+    />
+  );
 }
 
 export default function AdminPanel() {
@@ -337,7 +345,7 @@ export default function AdminPanel() {
                 value={data.profile.avatar}
                 onChange={(v) => updateProfile({ avatar: v })}
                 token={authToken}
-                hint="JPEG, PNG, WebP, or GIF — max 5 MB"
+                hint="JPEG, PNG, WebP, GIF, or SVG — max 5 MB"
               />
             )}
             <TextField
@@ -397,7 +405,7 @@ export default function AdminPanel() {
                   onClick={() => {
                     const next = [
                       ...data.profile.socialLinks,
-                      { platform: "", url: "", icon: "logo-github" },
+                      { platform: "", url: "", icon: "logo-github", logo: "" },
                     ];
                     updateProfile({ socialLinks: next });
                     setSelectedIndex(next.length - 1);
@@ -412,6 +420,17 @@ export default function AdminPanel() {
                 emptyMessage="No social links yet."
                 columns={[
                   {
+                    key: "logo",
+                    header: "",
+                    className: "admin-table-col-thumb",
+                    render: (link) =>
+                      link.logo ? (
+                        <TableThumb src={link.logo} alt="" />
+                      ) : (
+                        <span className="admin-table-thumb-empty">—</span>
+                      ),
+                  },
+                  {
                     key: "platform",
                     header: "Platform",
                     render: (link) => link.platform || "—",
@@ -423,7 +442,7 @@ export default function AdminPanel() {
                   },
                   {
                     key: "icon",
-                    header: "Icon",
+                    header: "Icon fallback",
                     render: (link) => link.icon || "—",
                   },
                 ]}
@@ -478,8 +497,24 @@ export default function AdminPanel() {
                       updateProfile({ socialLinks });
                     }}
                   />
+                  {authToken && (
+                    <ImageUploadField
+                      label="Logo"
+                      value={selectedSocialLink.logo ?? ""}
+                      onChange={(v) => {
+                        const socialLinks = [...data.profile.socialLinks];
+                        socialLinks[selectedIndex] = {
+                          ...selectedSocialLink,
+                          logo: v,
+                        };
+                        updateProfile({ socialLinks });
+                      }}
+                      token={authToken}
+                      hint="Square PNG/SVG works best. Shown on the contact page when set."
+                    />
+                  )}
                   <TextField
-                    label="Icon (ion-icon name)"
+                    label="Icon fallback (ion-icon name)"
                     value={selectedSocialLink.icon}
                     onChange={(v) => {
                       const socialLinks = [...data.profile.socialLinks];

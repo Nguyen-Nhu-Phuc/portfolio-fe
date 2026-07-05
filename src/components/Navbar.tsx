@@ -28,7 +28,8 @@ export default function Navbar({
   const router = useRouter();
   const { locale } = useLocale();
   const routeLocale = localeFromPath(pathname) || locale;
-  const isProjectPage = /\/project\//.test(pathname);
+  const isBlogPostPage = /\/blog\/.+/.test(pathname);
+  const isDetailPage = /\/project\//.test(pathname) || isBlogPostPage;
 
   const NAV_ITEMS: { label: string; page: PageName }[] = [
     { label: t.nav.about, page: "about" },
@@ -41,19 +42,23 @@ export default function Navbar({
   const activeIndex = NAV_ITEMS.findIndex((item) => item.page === activePage);
 
   const handleBack = () => {
-    router.push(pathForPage("portfolio", routeLocale));
+    router.push(
+      pathForPage(isBlogPostPage ? "blog" : "portfolio", routeLocale)
+    );
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <header className="site-header">
       <div className="header-bar">
-        {isProjectPage ? (
+        {isDetailPage ? (
           <ButtonRound
             variant="accent"
             className="header-back"
             onClick={handleBack}
-            aria-label={t.project.backToPortfolio}
+            aria-label={
+              isBlogPostPage ? t.blog.backToBlog : t.project.backToPortfolio
+            }
           >
             <ArrowRightLong className="header-back-icon" />
           </ButtonRound>
@@ -67,7 +72,7 @@ export default function Navbar({
           </button>
         )}
 
-        {!isProjectPage && (
+        {!isDetailPage && (
           <nav
             className="header-pill-nav"
             aria-label="Sections"
@@ -108,7 +113,7 @@ export default function Navbar({
         </div>
       </div>
 
-      {!isProjectPage && (
+      {!isDetailPage && (
         <nav className="sub-nav-mobile" aria-label="Sections">
           <ul className="sub-nav-list">
             {NAV_ITEMS.map(({ label, page }) => (

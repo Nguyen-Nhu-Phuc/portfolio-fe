@@ -32,10 +32,71 @@ function observeElements(elements: Element[]): IntersectionObserver | undefined 
 
   elements.forEach((el) => {
     el.classList.remove("is-visible");
+
+    const rect = el.getBoundingClientRect();
+    const inView =
+      rect.width > 0 &&
+      rect.height > 0 &&
+      rect.top < window.innerHeight &&
+      rect.bottom > 0;
+
+    if (inView) {
+      el.classList.add("is-visible");
+      return;
+    }
+
     observer.observe(el);
   });
 
   return observer;
+}
+
+function setupPageReveals(activePage: PageName): () => void {
+  if (prefersReducedMotion()) {
+    document
+      .querySelectorAll(`article[data-page="${activePage}"] .reveal`)
+      .forEach((el) => el.classList.add("is-visible"));
+    return () => {};
+  }
+
+  let observer: IntersectionObserver | undefined;
+  let cancelled = false;
+  const timers: number[] = [];
+
+  const run = (attempt = 0) => {
+    if (cancelled) return;
+
+    const root = document.querySelector(
+      `article[data-page="${activePage}"].active`
+    );
+    if (!root) {
+      if (attempt < 30) {
+        timers.push(window.setTimeout(() => run(attempt + 1), 50));
+      }
+      return;
+    }
+
+    const allReveals = Array.from(root.querySelectorAll(".reveal"));
+    if (allReveals.length === 0 && attempt < 30) {
+      timers.push(window.setTimeout(() => run(attempt + 1), 50));
+      return;
+    }
+
+    const heroReveals = allReveals.filter((el) => el.closest(".page-hero"));
+    const scrollReveals = allReveals.filter((el) => !el.closest(".page-hero"));
+
+    requestAnimationFrame(() => revealImmediately(heroReveals));
+    observer?.disconnect();
+    observer = observeElements(scrollReveals);
+  };
+
+  timers.push(window.setTimeout(() => run(0), 40));
+
+  return () => {
+    cancelled = true;
+    timers.forEach((id) => window.clearTimeout(id));
+    observer?.disconnect();
+  };
 }
 
 export default function ScrollRevealObserver({
@@ -56,35 +117,7 @@ export default function ScrollRevealObserver({
     return () => footerObserver?.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (prefersReducedMotion()) {
-      document
-        .querySelectorAll(`article[data-page="${activePage}"] .reveal`)
-        .forEach((el) => el.classList.add("is-visible"));
-      return;
-    }
-
-    let observer: IntersectionObserver | undefined;
-
-    const timer = window.setTimeout(() => {
-      const root = document.querySelector(
-        `article[data-page="${activePage}"].active`
-      );
-      if (!root) return;
-
-      const allReveals = Array.from(root.querySelectorAll(".reveal"));
-      const heroReveals = allReveals.filter((el) => el.closest(".page-hero"));
-      const scrollReveals = allReveals.filter((el) => !el.closest(".page-hero"));
-
-      requestAnimationFrame(() => revealImmediately(heroReveals));
-      observer = observeElements(scrollReveals);
-    }, 40);
-
-    return () => {
-      window.clearTimeout(timer);
-      observer?.disconnect();
-    };
-  }, [activePage]);
+  useEffect(() => setupPageReveals(activePage), [activePage]);
 
   return null;
 }

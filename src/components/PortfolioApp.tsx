@@ -12,11 +12,11 @@ import Footer from "./Footer";
 import FooterCta from "./FooterCta";
 import ContactFab from "./ContactFab";
 import About from "./About";
+import Blog from "./Blog";
 import ScrollRevealObserver from "./ScrollRevealObserver";
 
 const Resume = dynamic(() => import("./Resume"));
 const PortfolioSection = dynamic(() => import("./PortfolioSection"));
-const Blog = dynamic(() => import("./Blog"));
 const Contact = dynamic(() => import("./Contact"));
 
 interface PortfolioAppProps {

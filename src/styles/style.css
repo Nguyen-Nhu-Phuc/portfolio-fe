@@ -1294,6 +1294,10 @@ article.active {
   display: block;
 }
 
+article.active .blog-post-card {
+  display: block;
+}
+
 .h2, .h3, .h4, .h5 {
   color: var(--color-ink);
   font-weight: var(--fw-semibold);
@@ -3628,6 +3632,13 @@ textarea.form-input {
 .contact-social-link ion-icon,
 .contact-social-link [data-ionicon] {
   font-size: 18px;
+}
+
+.contact-social-link .social-link-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .site-footer-contact-btn {

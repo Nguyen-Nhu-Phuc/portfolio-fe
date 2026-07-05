@@ -2410,6 +2410,24 @@ body {
   }
 }
 
+.blog-detail-eyebrow {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--color-body-muted);
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.next-project-image--placeholder {
+  display: block;
+  width: 120px;
+  min-height: 80px;
+  background: var(--color-surface-pearl);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-md);
+}
+
 /*-----------------------------------*\
   #CONTACT PAGE
 \*-----------------------------------*/

@@ -1,17 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import PortfolioImage from "./PortfolioImage";
 import PageHero from "./PageHero";
 import { BlogPost } from "@/types/portfolio";
+import { pathForBlog } from "@/lib/blogSlug";
 import { useMessages } from "@/hooks/useMessages";
 import { useLocale } from "@/context/LocaleProvider";
+import { Locale } from "@/types/localized";
 
 interface BlogProps {
   blogs: BlogPost[];
   isActive?: boolean;
 }
 
-function formatBlogDate(dateStr: string, locale: string) {
+function formatBlogDate(dateStr: string, locale: Locale) {
   const date = new Date(dateStr);
   return date.toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US", {
     day: "numeric",
@@ -27,28 +30,30 @@ function BlogPostCard({
   featured = false,
 }: {
   post: BlogPost;
-  locale: string;
+  locale: Locale;
   readLabel: string;
   featured?: boolean;
 }) {
   return (
-    <article className={`blog-post-card${featured ? " blog-post-card--featured" : ""} reveal`}>
-      <a href={post.url} className="blog-post-card-link">
-        <figure className="blog-post-card-media">
-          <PortfolioImage
-            src={post.image}
-            alt={post.title}
-            width={0}
-            height={0}
-            sizes={
-              featured
-                ? "(max-width: 768px) 100vw, 640px"
-                : "(max-width: 768px) 100vw, 400px"
-            }
-            loading={featured ? "eager" : "lazy"}
-            style={{ width: "100%", height: "auto" }}
-          />
-        </figure>
+    <div className={`blog-post-card${featured ? " blog-post-card--featured" : ""}`}>
+      <Link href={pathForBlog(post, locale)} className="blog-post-card-link">
+        {post.image ? (
+          <figure className="blog-post-card-media">
+            <PortfolioImage
+              src={post.image}
+              alt={post.title}
+              width={0}
+              height={0}
+              sizes={
+                featured
+                  ? "(max-width: 768px) 100vw, 640px"
+                  : "(max-width: 768px) 100vw, 400px"
+              }
+              loading={featured ? "eager" : "lazy"}
+              style={{ width: "100%", height: "auto" }}
+            />
+          </figure>
+        ) : null}
         <div className="blog-post-card-body">
           <div className="blog-meta">
             <span className="blog-category">{post.category}</span>
@@ -59,8 +64,8 @@ function BlogPostCard({
           <p className="blog-post-card-excerpt">{post.excerpt}</p>
           <span className="text-link blog-post-card-cta">{readLabel}</span>
         </div>
-      </a>
-    </article>
+      </Link>
+    </div>
   );
 }
 
@@ -70,6 +75,15 @@ export default function Blog({ blogs, isActive = false }: BlogProps) {
   const featured = blogs[0];
   const rest = blogs.slice(1);
   const categories = [...new Set(blogs.map((post) => post.category))];
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   const lead = featured
     ? t.blog.lead.replace("{category}", featured.category.toLowerCase())
@@ -90,7 +104,7 @@ export default function Blog({ blogs, isActive = false }: BlogProps) {
                 { value: String(blogs.length), label: t.stats.articles },
                 { value: String(categories.length), label: t.blog.topics },
                 {
-                  value: formatBlogDate(featured.date, locale),
+                  value: formatDate(featured.date),
                   label: t.blog.latestPost,
                 },
               ]
@@ -99,16 +113,16 @@ export default function Blog({ blogs, isActive = false }: BlogProps) {
       />
 
       <div className="tile-stack">
-        <section className="tile tile--light reveal">
+        <section className="tile tile--light">
           <div className="tile-inner tile-inner--wide">
             {blogs.length === 0 ? (
               <p className="blog-empty">{t.blog.empty}</p>
             ) : (
               <>
                 {categories.length > 0 && (
-                  <ul className="skill-tags blog-category-tags reveal-stagger">
+                  <ul className="skill-tags blog-category-tags">
                     {categories.map((category) => (
-                      <li className="skill-tag reveal" key={category}>
+                      <li className="skill-tag" key={category}>
                         {category}
                       </li>
                     ))}
@@ -127,7 +141,7 @@ export default function Blog({ blogs, isActive = false }: BlogProps) {
                     <h2 className="tile-heading blog-posts-heading">
                       {t.blog.allPosts}
                     </h2>
-                    <ul className="blog-posts-grid reveal-stagger">
+                    <ul className="blog-posts-grid">
                       {rest.map((post) => (
                         <li key={post.title}>
                           <BlogPostCard

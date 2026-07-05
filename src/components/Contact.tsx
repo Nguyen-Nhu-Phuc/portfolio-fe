@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import IonIcon from "./IonIcon";
+import SocialLinkIcon from "./SocialLinkIcon";
 import PageHero from "./PageHero";
 import { Profile } from "@/types/portfolio";
 import { submitContact } from "@/lib/api";
@@ -141,7 +142,7 @@ export default function Contact({ profile, isActive = false }: ContactProps) {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <IonIcon name={link.icon} aria-hidden="true" />
+                            <SocialLinkIcon link={link} />
                             <span>
                               {link.platform.charAt(0).toUpperCase() +
                                 link.platform.slice(1)}

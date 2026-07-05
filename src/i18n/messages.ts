@@ -129,6 +129,8 @@ export const messages = {
       readLatest: "Read latest",
       allPosts: "All posts",
       empty: "No articles published yet.",
+      backToBlog: "Back to blog",
+      nextPost: "Next post",
     },
     resume: {
       eyebrow: "Résumé",
@@ -285,6 +287,8 @@ export const messages = {
       readLatest: "Đọc bài mới",
       allPosts: "Tất cả bài viết",
       empty: "Chưa có bài viết nào.",
+      backToBlog: "Quay lại blog",
+      nextPost: "Bài tiếp theo",
     },
     resume: {
       eyebrow: "Hồ sơ",

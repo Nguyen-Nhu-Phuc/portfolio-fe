@@ -8,6 +8,13 @@ function uploadSrcForNextImage(path: string): string {
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+export function isSvgSrc(url: string): boolean {
+  if (!url?.trim()) return false;
+
+  const path = url.split("?")[0]?.split("#")[0]?.toLowerCase() ?? "";
+  return path.endsWith(".svg");
+}
+
 export function isCloudinaryUrl(url: string): boolean {
   if (!url?.trim()) return false;
 

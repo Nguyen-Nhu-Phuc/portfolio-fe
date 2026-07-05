@@ -14,6 +14,7 @@ export interface AdminSocialLink {
   platform: string;
   url: string;
   icon: string;
+  logo?: string;
 }
 
 export interface AdminProfile {
